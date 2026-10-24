@@ -3,9 +3,11 @@
 ## 1. System Design
 
 **a. Initial design**
+The PawPal+ application is designed to help pet owners organize their daily pet care activities. The system will allow users to perform three main actions:
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+Add Pet Information: Users can enter basic information about themselves and their pets, including the pet's name, breed, and age.
+Manage Pet Care Tasks: Users can create and edit tasks such as feeding, walking, grooming, and giving medication. Each task will include a duration and priority level.
+Generate a Daily Schedule: Users can generate a daily schedule based on the available time and priority of each task. The application will organize tasks so that important activities are completed first while considering the owner's preferences.
 
 **b. Design changes**
 
