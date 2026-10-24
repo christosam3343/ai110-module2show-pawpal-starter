@@ -42,13 +42,15 @@ After reviewing the design, I added a pets list to Owner because the class had a
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+I used AI to help brainstorm the UML diagram and the four classes: Owner, Pet, Task, and Scheduler. AI helped generate the initial Python class skeletons from the design. During the review, it identified that Owner had an add_pet() method and an ownership relationship in the UML but no pets collection to store those pets.
+
+AI also helped implement the core class methods, create the multi-pet demonstration in main.py, and write the two pytest tests. Useful suggestions included adding the pets collection, combining tasks through Owner.get_all_tasks(), and keeping task lists separate for each pet. Giving clear prompts that limited the work to one assignment step helped keep the code simple and avoid implementing later phases too early.
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+I checked the proposed changes against the assignment requirements and existing design before accepting them. For example, I accepted adding a pets collection to Owner because it matched the UML relationship and supported multiple pets. I deferred advanced sorting, conflict detection, and recurring task logic until Phase 4. Those scheduling methods clearly raise NotImplementedError instead of claiming to generate a working schedule.
+
+We checked Python syntax with py_compile, ran the CLI demo to confirm that both pets and all four tasks appeared, and ran pytest to verify task completion and task addition. Both tests passed. We also added mark_complete() to call the existing mark_completed() method when the test requirement used a different method name. Testing AI-generated code is important because code can look correct but still have missing methods or incorrect behavior. These checks support the features implemented so far; they do not verify the future scheduling algorithms.
 
 ---
 

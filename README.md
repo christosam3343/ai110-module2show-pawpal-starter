@@ -22,6 +22,14 @@ Your final app should:
 - Display the plan clearly (and ideally explain the reasoning)
 - Include tests for the most important scheduling behaviors
 
+## Implementation Summary
+
+The core Python classes now support pet care task management. `Owner` stores owner information and a list of multiple `Pet` objects. Each `Pet` stores its information and manages its own `Task` objects through methods to add, remove, and retrieve tasks. Tasks include descriptions, durations in minutes, priorities, frequency, and completion status, with methods to update their information and mark them complete or incomplete.
+
+`Owner.get_all_tasks()` combines the tasks from every pet. `Scheduler` accesses that combined list through the owner, so it includes tasks for all pets. `main.py` demonstrates this with John, Biscuit, Luna, and four care tasks, printing a preliminary daily task preview.
+
+The two pytest tests check that marking a task complete changes its status and that adding a task increases a pet's task count by one and stores the task. Advanced scheduling, including sorting, conflict detection, and recurring task handling, is reserved for Phase 4. Connecting the backend to the starter Streamlit interface will happen in a later phase.
+
 ## Getting started
 
 ### Setup
@@ -44,14 +52,20 @@ pip install -r requirements.txt
 
 ## 🖥️ Sample Output
 
-Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
+Run `python main.py` in the project's virtual environment to see this preliminary daily task preview. Automatic scheduling will be implemented in Phase 4.
 
-```
-# e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
+```text
+Today's Schedule - PawPal+
+Owner: John
+Preliminary daily task preview (no automatic sorting or start times).
+
+Biscuit (Golden Retriever)
+- Morning Walk | 30 minutes | Priority: high | Status: incomplete
+- Breakfast | 10 minutes | Priority: high | Status: incomplete
+
+Luna (Persian Cat)
+- Feeding | 15 minutes | Priority: high | Status: incomplete
+- Grooming | 20 minutes | Priority: medium | Status: incomplete
 ```
 
 ## 🧪 Testing PawPal+
