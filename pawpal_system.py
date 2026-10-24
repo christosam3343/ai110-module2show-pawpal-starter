@@ -1,3 +1,11 @@
+"""PawPal+ class skeletons.
+
+Task durations and owner/scheduler available time are measured in minutes.
+Task priority levels are high, medium, and low.
+These are design assumptions; validation and scheduling are not implemented yet.
+For future task updates, None means to leave that field unchanged.
+"""
+
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
@@ -12,6 +20,7 @@ class Owner:
         self.name = name
         self.available_time = available_time
         self.preferences = preferences if preferences is not None else {}
+        self.pets: List["Pet"] = []
 
     def add_pet(self, pet: "Pet") -> None:
         pass
@@ -41,7 +50,13 @@ class Task:
     priority: str
     frequency: str
 
-    def update_task(self) -> None:
+    def update_task(
+        self,
+        name: Optional[str] = None,
+        duration: Optional[float] = None,
+        priority: Optional[str] = None,
+        frequency: Optional[str] = None,
+    ) -> None:
         pass
 
     def get_details(self) -> str:

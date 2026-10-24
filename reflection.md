@@ -9,10 +9,18 @@ Add Pet Information: Users can enter basic information about themselves and thei
 Manage Pet Care Tasks: Users can create and edit tasks such as feeding, walking, grooming, and giving medication. Each task will include a duration and priority level.
 Generate a Daily Schedule: Users can generate a daily schedule based on the available time and priority of each task. The application will organize tasks so that important activities are completed first while considering the owner's preferences.
 
+The design uses four classes:
+
+- Owner stores the owner's name, available time, preferences, and list of pets.
+- Pet stores a pet's name, breed, age, and list of care tasks.
+- Task describes a care activity, including its name, duration, priority, and frequency. It includes method stubs for updating its information and getting its details.
+- Scheduler holds the tasks and available time. Its planned responsibility is to order tasks, check for conflicts, and generate a daily schedule.
+
+Task durations and available time will use minutes. Task priorities will be high, medium, or low. These assumptions are documented, but validation and scheduling logic have not been implemented yet.
+
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+After reviewing the design, I added a pets list to Owner because the class had an add_pet() method but no collection to store the pets. This also makes the Python skeleton match the Owner-to-Pet relationship in the UML. I added optional name, duration, priority, and frequency parameters to Task.update_task() to make it clear which information can be changed later. A parameter left as None will mean that field should stay unchanged. I updated the UML to match these changes and documented minutes and the three priority levels to keep the design consistent. The behavior methods remain empty stubs for a later phase.
 
 ---
 

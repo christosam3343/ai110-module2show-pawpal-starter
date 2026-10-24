@@ -1,8 +1,12 @@
 classDiagram
+    %% Duration and available_time are measured in minutes.
+    %% Priority levels are high, medium, and low (not yet validated).
+    %% Optional update parameters default to None, meaning leave the field unchanged.
     class Owner {
         +name: str
         +available_time: float
         +preferences: dict
+        +pets: list~Pet~
         +add_pet(pet: Pet): void
         +update_availability(time: float): void
     }
@@ -21,7 +25,7 @@ classDiagram
         +duration: float
         +priority: str
         +frequency: str
-        +update_task(): void
+        +update_task(name: Optional~str~ = None, duration: Optional~float~ = None, priority: Optional~str~ = None, frequency: Optional~str~ = None): void
         +get_details(): str
     }
 
