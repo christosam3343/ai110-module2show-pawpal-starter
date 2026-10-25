@@ -26,9 +26,9 @@ Your final app should:
 
 The core Python classes now support pet care task management. `Owner` stores owner information and a list of multiple `Pet` objects. Each `Pet` stores its information and manages its own `Task` objects through methods to add, remove, and retrieve tasks. Tasks include descriptions, durations in minutes, priorities, frequency, and completion status, with methods to update their information and mark them complete or incomplete.
 
-`Owner.get_all_tasks()` combines the tasks from every pet. `Scheduler` accesses that combined list through the owner, so it includes tasks for all pets. `main.py` demonstrates this with John, Biscuit, Luna, and four care tasks, printing a preliminary daily task preview.
+`Owner.get_all_tasks()` combines the tasks from every pet. `Scheduler` accesses that combined list through the owner, so it includes tasks for all pets. `main.py` demonstrates this with John, Biscuit, Luna, and five initial care tasks, followed by sorting, filtering, recurring occurrences, and an overlap warning.
 
-The two pytest tests check that marking a task complete changes its status and that adding a task increases a pet's task count by one and stores the task. Advanced scheduling, including sorting, conflict detection, and recurring task handling, is reserved for Phase 4. Connecting the backend to the starter Streamlit interface will happen in a later phase.
+The original two pytest tests check task completion and task addition. The expanded suite also covers time validation, sorting, filtering, daily and weekly recurrence, and conflict detection. The Streamlit interface now records pets and tasks in a session-state Owner. Its scheduling control remains disabled; the implemented scheduling features are demonstrated through the backend and CLI.
 
 ## Getting started
 
@@ -52,20 +52,48 @@ pip install -r requirements.txt
 
 ## 🖥️ Sample Output
 
-Run `python main.py` in the project's virtual environment to see this preliminary daily task preview. Automatic scheduling will be implemented in Phase 4.
+Run `python main.py` in the project's virtual environment to see the current multi-pet demonstration. It uses a fixed completion date for repeatable output and manually entered task times; it does not automatically build or rearrange a plan.
 
 ```text
 Today's Schedule - PawPal+
 Owner: John
-Preliminary daily task preview (no automatic sorting or start times).
+Times are entered manually; overlap warnings do not move tasks.
 
 Biscuit (Golden Retriever)
-- Morning Walk | 30 minutes | Priority: high | Status: incomplete
-- Breakfast | 10 minutes | Priority: high | Status: incomplete
+- 09:00 | Biscuit | Morning Walk | 30 minutes | Priority: high | Due: 2026-10-24 | Status: incomplete
+- 08:00 | Biscuit | Breakfast | 10 minutes | Priority: high | Due: 2026-10-24 | Status: incomplete
 
 Luna (Persian Cat)
-- Feeding | 15 minutes | Priority: high | Status: incomplete
-- Grooming | 20 minutes | Priority: medium | Status: incomplete
+- 07:30 | Luna | Feeding | 15 minutes | Priority: high | Due: 2026-10-24 | Status: incomplete
+- 10:00 | Luna | Grooming | 20 minutes | Priority: medium | Due: 2026-10-24 | Status: incomplete
+- 09:15 | Luna | Playtime | 20 minutes | Priority: low | Due: 2026-10-24 | Status: incomplete
+
+All pets - sorted by time
+- 07:30 | Luna | Feeding | 15 minutes | Priority: high | Due: 2026-10-24 | Status: incomplete
+- 08:00 | Biscuit | Breakfast | 10 minutes | Priority: high | Due: 2026-10-24 | Status: incomplete
+- 09:00 | Biscuit | Morning Walk | 30 minutes | Priority: high | Due: 2026-10-24 | Status: incomplete
+- 09:15 | Luna | Playtime | 20 minutes | Priority: low | Due: 2026-10-24 | Status: incomplete
+- 10:00 | Luna | Grooming | 20 minutes | Priority: medium | Due: 2026-10-24 | Status: incomplete
+
+Biscuit - incomplete tasks
+- 09:00 | Biscuit | Morning Walk | 30 minutes | Priority: high | Due: 2026-10-24 | Status: incomplete
+- 08:00 | Biscuit | Breakfast | 10 minutes | Priority: high | Due: 2026-10-24 | Status: incomplete
+
+Recurring task completion demo - completed on 2026-10-24
+
+Biscuit - daily: completed original (kept in pet's task list)
+- 08:00 | Biscuit | Breakfast | 10 minutes | Priority: high | Due: 2026-10-24 | Status: completed
+New incomplete occurrence:
+- 08:00 | Biscuit | Breakfast | 10 minutes | Priority: high | Due: 2026-10-25 | Status: incomplete
+
+Luna - weekly: completed original (kept in pet's task list)
+- 10:00 | Luna | Grooming | 20 minutes | Priority: medium | Due: 2026-10-24 | Status: completed
+New incomplete occurrence:
+- 10:00 | Luna | Grooming | 20 minutes | Priority: medium | Due: 2026-10-31 | Status: incomplete
+
+Conflict check - incomplete tasks with a due date and clock time
+Tasks missing a due date or clock time are unscheduled and were not checked.
+Warning: Conflict on 2026-10-24: Biscuit - Morning Walk (09:00, 30 minutes) overlaps Luna - Playtime (09:15, 20 minutes).
 ```
 
 ## 🧪 Testing PawPal+
@@ -84,16 +112,22 @@ Sample test output:
 # Paste your pytest output here
 ```
 
-## 📐 Smarter Scheduling
+## Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
+The Scheduler methods below retrieve tasks across all pets through `Owner.get_all_tasks()`. Recurrence is handled by the pet that owns the task.
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Time sorting | `Scheduler.sort_by_time()`, `Scheduler.sort_tasks()` | Return a new list ordered by validated `HH:MM` clock times. Untimed tasks go last; equal times and untimed tasks retain their original order. Sorting does not change stored lists or order tasks by due date. |
+| Pet/status filtering | `Scheduler.filter_tasks(pet_name=None, completed=None)` | Filter by exact pet name, completion status, or both. A shared name includes every matching pet. `completed=False` selects incomplete tasks; `None` leaves that filter off. |
+| Recurring tasks | `Pet.complete_task(task, completion_date=None)` | Complete a task belonging to that pet and append one incomplete successor: daily tasks are due 1 day after completion, weekly tasks 7 days after completion. Copy task details and clock time, preserve the original, and prevent duplicate successors. Omitted completion dates use today. Other frequencies create no successor. |
+| Overlap warnings | `Scheduler.detect_conflicts()` | Return warning messages for incomplete tasks with overlapping start times and durations on the same due date, including tasks for different pets. Back-to-back tasks are allowed, each pair is reported once, and no conflicts returns an empty list. |
+
+Use `Pet.complete_task()` to trigger recurrence; `Task.mark_complete()` and `Task.mark_completed()` only change completion status. The next occurrence is already stored on the same pet.
+
+Conflict checks require a due date, clock time, and positive duration. Tasks missing a date or time are unscheduled and are not checked, so an empty warning list does not establish that those tasks are conflict-free. Overnight overlaps between different due dates are not detected. Priorities and available minutes are stored, but these methods do not automatically choose tasks to fit a time budget or move conflicting tasks.
+
+The Streamlit **Generate schedule** control is still disabled, and `Scheduler.generate_schedule()` still raises `NotImplementedError`. Streamlit supports adding pets and recording tasks; the sorting, filtering, recurrence, and conflict workflows above are currently demonstrated in `main.py` and verified by pytest.
 
 ## 📸 Demo Walkthrough
 

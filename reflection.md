@@ -33,8 +33,7 @@ After reviewing the design, I added a pets list to Owner because the class had a
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+My conflict checker compares incomplete tasks that have a clock time and share the same due date. This catches same-day overlaps, but it can miss an overnight overlap, such as a task starting at 23:50 for 30 minutes and another starting at 00:10 the next day. I kept the nested loops and this simpler same-date rule for the assignment because they are easier to read and explain, rather than adding cross-date time calculations.
 
 ---
 
