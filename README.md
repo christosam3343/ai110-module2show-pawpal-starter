@@ -96,21 +96,31 @@ Tasks missing a due date or clock time are unscheduled and were not checked.
 Warning: Conflict on 2026-10-24: Biscuit - Morning Walk (09:00, 30 minutes) overlaps Luna - Playtime (09:15, 20 minutes).
 ```
 
-## 🧪 Testing PawPal+
+## Testing PawPal+
+
+Run the full test suite from the project root with the virtual environment active:
 
 ```bash
-# Run the full test suite:
-pytest
-
-# Run with coverage:
-pytest --cov
+python -m pytest
 ```
 
-Sample test output:
+The suite covers task completion and addition, time validation, chronological sorting, pet/status filtering, multi-pet task retrieval, daily and weekly recurrence, calendar rollover, and duplicate prevention. Conflict tests cover exact matches, partial and fully contained overlaps, back-to-back tasks, and exclusion of completed or unscheduled tasks. The three new regression tests also check re-sorting after a time update without changing stored order and finding a pet added after Scheduler creation.
 
+Actual successful terminal output:
+
+```text
+============================= test session starts =============================
+platform win32 -- Python 3.14.5, pytest-9.1.1, pluggy-1.7.0
+rootdir: D:\OneDrive - University of New Haven\School Files - UNH\Sem 4\Codepath\ai110-module2show-pawpal-starter
+plugins: anyio-4.15.1
+collected 49 items
+
+tests\test_pawpal.py .................................................   [100%]
+
+============================= 49 passed in 0.21s ==============================
 ```
-# Paste your pytest output here
-```
+
+**Confidence Level: 4/5 stars (★★★★☆).** The main backend behaviors have automated coverage. Overnight conflicts across different due dates and full UI scheduling remain outside the implemented behavior; the Streamlit Generate schedule control is still disabled.
 
 ## Smarter Scheduling
 

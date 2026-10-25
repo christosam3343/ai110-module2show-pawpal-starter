@@ -466,3 +466,60 @@ def test_zero_duration_task_does_not_occupy_time() -> None:
     pet.add_task(Task("Reminder", 0, "low", "once", time="09:15", due_date=date(2026, 10, 24)))
 
     assert Scheduler(owner).detect_conflicts() == []
+
+
+def test_sort_reflects_updated_task_time_without_reordering_stored_tasks() -> None:
+    owner = Owner("John", 90)
+    pet = Pet("Biscuit", "Golden Retriever", 3)
+    owner.add_pet(pet)
+    walk = Task("Walk", 30, "high", "daily", time="09:00")
+    feeding = Task("Feeding", 10, "high", "daily", time="10:00")
+    pet.add_task(walk)
+    pet.add_task(feeding)
+    scheduler = Scheduler(owner)
+    assert scheduler.sort_by_time() == [walk, feeding]
+
+    walk.update_task(time="11:00")
+    sorted_tasks = scheduler.sort_by_time()
+
+    assert sorted_tasks == [feeding, walk]
+    assert sorted_tasks is not pet.tasks
+    assert pet.tasks == [walk, feeding]
+
+
+def test_conflicts_detect_fully_contained_task() -> None:
+    owner = Owner("John", 90)
+    pet = Pet("Biscuit", "Golden Retriever", 3)
+    owner.add_pet(pet)
+    long_walk = Task("Long walk", 60, "high", "once", time="09:00", due_date=date(2026, 10, 24))
+    medication = Task("Medication", 10, "high", "once", time="09:15", due_date=date(2026, 10, 24))
+    pet.add_task(long_walk)
+    pet.add_task(medication)
+
+    warnings = Scheduler(owner).detect_conflicts()
+
+    assert len(warnings) == 1
+    assert warnings[0] == (
+        "Warning: Conflict on 2026-10-24: Biscuit - Long walk (09:00, 60 minutes) "
+        "overlaps Biscuit - Medication (09:15, 10 minutes)."
+    )
+
+
+def test_sort_includes_pet_added_after_scheduler_creation() -> None:
+    owner = Owner("John", 90)
+    biscuit = Pet("Biscuit", "Golden Retriever", 3)
+    walk = Task("Walk", 30, "high", "daily", time="10:00")
+    biscuit.add_task(walk)
+    owner.add_pet(biscuit)
+    scheduler = Scheduler(owner)
+    assert scheduler.sort_by_time() == [walk]
+
+    luna = Pet("Luna", "Persian Cat", 2)
+    feeding = Task("Feeding", 15, "high", "daily", time="08:00")
+    luna.add_task(feeding)
+    owner.add_pet(luna)
+
+    assert scheduler.sort_by_time() == [feeding, walk]
+    assert scheduler.get_tasks() == [walk, feeding]
+    assert biscuit.tasks == [walk]
+    assert luna.tasks == [feeding]
